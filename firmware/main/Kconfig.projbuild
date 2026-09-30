@@ -1,0 +1,115 @@
+menu "Drone navigation"
+
+config DRONE_NAV_CONFIDENCE_PERCENT
+    int "Minimum command confidence (%)"
+    range 1 100
+    default 72
+
+config DRONE_NAV_CONFIRM_FRAMES
+    int "Consecutive frames required for movement"
+    range 1 10
+    default 3
+
+config DRONE_NAV_FRAME_INTERVAL_MS
+    int "Delay between frames (ms)"
+    range 0 1000
+    default 30
+
+config DRONE_NAV_TENSOR_ARENA_KB
+    int "TFLite tensor arena size (KiB)"
+    range 128 1024
+    default 320
+
+menu "Flight controller UART"
+
+config DRONE_NAV_UART_PORT
+    int "UART port"
+    range 0 2
+    default 1
+
+config DRONE_NAV_UART_TX_PIN
+    int "UART TX GPIO"
+    range 0 48
+    default 43
+
+config DRONE_NAV_UART_RX_PIN
+    int "UART RX GPIO"
+    range 0 48
+    default 44
+
+config DRONE_NAV_UART_BAUD
+    int "UART baud rate"
+    default 115200
+
+endmenu
+
+menu "OV2640 camera pins (example ESP32-S3 WROOM CAM mapping)"
+
+config DRONE_CAM_PIN_PWDN
+    int "PWDN GPIO (-1 if unused)"
+    range -1 48
+    default -1
+config DRONE_CAM_PIN_RESET
+    int "RESET GPIO (-1 if unused)"
+    range -1 48
+    default -1
+config DRONE_CAM_PIN_XCLK
+    int "XCLK GPIO"
+    range 0 48
+    default 15
+config DRONE_CAM_PIN_SIOD
+    int "SIOD/SDA GPIO"
+    range 0 48
+    default 4
+config DRONE_CAM_PIN_SIOC
+    int "SIOC/SCL GPIO"
+    range 0 48
+    default 5
+config DRONE_CAM_PIN_D0
+    int "D0/Y2 GPIO"
+    range 0 48
+    default 11
+config DRONE_CAM_PIN_D1
+    int "D1/Y3 GPIO"
+    range 0 48
+    default 9
+config DRONE_CAM_PIN_D2
+    int "D2/Y4 GPIO"
+    range 0 48
+    default 8
+config DRONE_CAM_PIN_D3
+    int "D3/Y5 GPIO"
+    range 0 48
+    default 10
+config DRONE_CAM_PIN_D4
+    int "D4/Y6 GPIO"
+    range 0 48
+    default 12
+config DRONE_CAM_PIN_D5
+    int "D5/Y7 GPIO"
+    range 0 48
+    default 18
+config DRONE_CAM_PIN_D6
+    int "D6/Y8 GPIO"
+    range 0 48
+    default 17
+config DRONE_CAM_PIN_D7
+    int "D7/Y9 GPIO"
+    range 0 48
+    default 16
+config DRONE_CAM_PIN_VSYNC
+    int "VSYNC GPIO"
+    range 0 48
+    default 6
+config DRONE_CAM_PIN_HREF
+    int "HREF GPIO"
+    range 0 48
+    default 7
+config DRONE_CAM_PIN_PCLK
+    int "PCLK GPIO"
+    range 0 48
+    default 13
+
+endmenu
+endmenu
+
