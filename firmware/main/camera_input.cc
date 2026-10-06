@@ -5,8 +5,11 @@
 #include <cstddef>
 #include <cstdint>
 
+#include "driver/gpio.h"
 #include "esp_camera.h"
 #include "esp_log.h"
+#include "freertos/FreeRTOS.h"
+#include "freertos/task.h"
 #include "sdkconfig.h"
 
 namespace drone_nav {
@@ -22,6 +25,18 @@ uint8_t QuantizePixel(uint8_t value, float scale, int zero_point) {
 }  // namespace
 
 esp_err_t InitCamera() {
+  // Keep the sensor powered down while esp32-camera installs the VSYNC ISR.
+  // On a warm reset the OV3660 can otherwise keep emitting VSYNC edges before
+  // the driver's event queue exists, which makes the ISR access a null queue.
+  if (CONFIG_DRONE_CAM_PIN_PWDN >= 0) {
+    const gpio_num_t pwdn_pin =
+        static_cast<gpio_num_t>(CONFIG_DRONE_CAM_PIN_PWDN);
+    ESP_ERROR_CHECK(gpio_reset_pin(pwdn_pin));
+    ESP_ERROR_CHECK(gpio_set_direction(pwdn_pin, GPIO_MODE_OUTPUT));
+    ESP_ERROR_CHECK(gpio_set_level(pwdn_pin, 1));
+    vTaskDelay(pdMS_TO_TICKS(50));
+  }
+
   camera_config_t config = {};
   config.pin_pwdn = CONFIG_DRONE_CAM_PIN_PWDN;
   config.pin_reset = CONFIG_DRONE_CAM_PIN_RESET;

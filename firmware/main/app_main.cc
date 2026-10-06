@@ -19,10 +19,9 @@
 #include "tensorflow/lite/micro/micro_interpreter.h"
 #include "tensorflow/lite/micro/micro_mutable_op_resolver.h"
 #include "tensorflow/lite/schema/schema_generated.h"
-#include "tensorflow/lite/version.h"
 
 extern const uint8_t model_start[] asm(
-    "_binary_model_drone_nav_int8_tflite_start");
+    "_binary_drone_nav_int8_tflite_start");
 
 namespace drone_nav {
 namespace {
@@ -71,17 +70,19 @@ void Run() {
 
   const tflite::Model* model = tflite::GetModel(model_start);
   if (model->version() != TFLITE_SCHEMA_VERSION) {
-    ESP_LOGE(kTag, "TFLite schema mismatch: model=%d runtime=%d", model->version(),
-             TFLITE_SCHEMA_VERSION);
+    ESP_LOGE(kTag, "TFLite schema mismatch: model=%" PRIu32 " runtime=%" PRIu32,
+             static_cast<uint32_t>(model->version()),
+             static_cast<uint32_t>(TFLITE_SCHEMA_VERSION));
     return;
   }
 
-  tflite::MicroMutableOpResolver<5> resolver;
+  tflite::MicroMutableOpResolver<6> resolver;
   resolver.AddConv2D();
   resolver.AddDepthwiseConv2D();
   resolver.AddMean();
   resolver.AddFullyConnected();
   resolver.AddSoftmax();
+  resolver.AddQuantize();
 
   constexpr size_t kArenaBytes = CONFIG_DRONE_NAV_TENSOR_ARENA_KB * 1024;
   auto* arena = static_cast<uint8_t*>(
@@ -97,8 +98,11 @@ void Run() {
   tflite::MicroInterpreter interpreter(model, resolver, arena, kArenaBytes);
   if (interpreter.AllocateTensors() != kTfLiteOk) {
     ESP_LOGE(kTag, "AllocateTensors failed; increase DRONE_NAV_TENSOR_ARENA_KB");
-    heap_caps_free(arena);
-    return;
+    // Do not destroy a partially initialized interpreter. Some TFLM versions
+    // cannot safely tear down a graph after operator resolution fails.
+    while (true) {
+      vTaskDelay(pdMS_TO_TICKS(1000));
+    }
   }
 
   TfLiteTensor* input = interpreter.input(0);

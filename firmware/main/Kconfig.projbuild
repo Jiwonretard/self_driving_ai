@@ -25,17 +25,17 @@ menu "Flight controller UART"
 config DRONE_NAV_UART_PORT
     int "UART port"
     range 0 2
-    default 1
+    default 2
 
 config DRONE_NAV_UART_TX_PIN
     int "UART TX GPIO"
     range 0 48
-    default 43
+    default 14
 
 config DRONE_NAV_UART_RX_PIN
     int "UART RX GPIO"
     range 0 48
-    default 44
+    default 15
 
 config DRONE_NAV_UART_BAUD
     int "UART baud rate"
@@ -43,12 +43,12 @@ config DRONE_NAV_UART_BAUD
 
 endmenu
 
-menu "OV2640 camera pins (example ESP32-S3 WROOM CAM mapping)"
+menu "OV2640 camera pins (AI-Thinker ESP32-CAM mapping)"
 
 config DRONE_CAM_PIN_PWDN
     int "PWDN GPIO (-1 if unused)"
     range -1 48
-    default -1
+    default 32
 config DRONE_CAM_PIN_RESET
     int "RESET GPIO (-1 if unused)"
     range -1 48
@@ -56,60 +56,59 @@ config DRONE_CAM_PIN_RESET
 config DRONE_CAM_PIN_XCLK
     int "XCLK GPIO"
     range 0 48
-    default 15
+    default 0
 config DRONE_CAM_PIN_SIOD
     int "SIOD/SDA GPIO"
     range 0 48
-    default 4
+    default 26
 config DRONE_CAM_PIN_SIOC
     int "SIOC/SCL GPIO"
     range 0 48
-    default 5
+    default 27
 config DRONE_CAM_PIN_D0
     int "D0/Y2 GPIO"
     range 0 48
-    default 11
+    default 5
 config DRONE_CAM_PIN_D1
     int "D1/Y3 GPIO"
     range 0 48
-    default 9
+    default 18
 config DRONE_CAM_PIN_D2
     int "D2/Y4 GPIO"
     range 0 48
-    default 8
+    default 19
 config DRONE_CAM_PIN_D3
     int "D3/Y5 GPIO"
     range 0 48
-    default 10
+    default 21
 config DRONE_CAM_PIN_D4
     int "D4/Y6 GPIO"
     range 0 48
-    default 12
+    default 36
 config DRONE_CAM_PIN_D5
     int "D5/Y7 GPIO"
     range 0 48
-    default 18
+    default 39
 config DRONE_CAM_PIN_D6
     int "D6/Y8 GPIO"
     range 0 48
-    default 17
+    default 34
 config DRONE_CAM_PIN_D7
     int "D7/Y9 GPIO"
     range 0 48
-    default 16
+    default 35
 config DRONE_CAM_PIN_VSYNC
     int "VSYNC GPIO"
     range 0 48
-    default 6
+    default 25
 config DRONE_CAM_PIN_HREF
     int "HREF GPIO"
     range 0 48
-    default 7
+    default 23
 config DRONE_CAM_PIN_PCLK
     int "PCLK GPIO"
     range 0 48
-    default 13
+    default 22
 
 endmenu
 endmenu
-

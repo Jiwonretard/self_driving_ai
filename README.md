@@ -30,6 +30,22 @@ pip install -e .
 
 ## 2. 데이터 구성
 
+### PULP-Dronet v3 준비
+
+공식 원본 ZIP을 `raw_data`에 압축 해제한 뒤 네 개 행동 클래스로 변환합니다.
+
+```bash
+mkdir -p raw_data
+unzip ~/Downloads/Dataset_PULP_Dronet_v3.zip -d raw_data
+python tools/prepare_pulp_dronet.py \
+  --source raw_data/Dataset_PULP_Dronet_v3 \
+  --output dataset
+```
+
+변환 규칙은 충돌 라벨을 최우선으로 `stop`에 배정하고, 충돌 위험이 없을 때 yaw가 `+0.2`보다 크면 `left`, `-0.2`보다 작으면 `right`, 나머지는 `forward`입니다. 이미지 파일은 기본적으로 하드 링크하므로 원본을 한 번 더 복사하지 않습니다. 클래스 편중은 학습 시 자동 계산되는 클래스 가중치로 보정합니다.
+
+### 폴더 형식
+
 각 사진은 **그 사진을 본 순간 취해야 할 안전한 행동** 폴더에 넣습니다.
 
 ```text

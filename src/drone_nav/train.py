@@ -3,6 +3,7 @@ from __future__ import annotations
 import argparse
 import json
 import shutil
+from collections import Counter
 from pathlib import Path
 
 import numpy as np
@@ -50,6 +51,20 @@ def load_split(path: Path, batch_size: int, shuffle: bool, seed: int) -> tf.data
         seed=seed,
     )
     return dataset.prefetch(AUTOTUNE)
+
+
+def balanced_class_weights(train_dir: Path) -> dict[int, float]:
+    counts = Counter(
+        {
+            index: sum(1 for path in (train_dir / label).iterdir() if path.is_file())
+            for index, label in enumerate(CLASS_NAMES)
+        }
+    )
+    if any(counts[index] == 0 for index in range(len(CLASS_NAMES))):
+        raise ValueError(f"every training class must contain images: {dict(counts)}")
+    total = sum(counts.values())
+    class_count = len(CLASS_NAMES)
+    return {index: total / (class_count * counts[index]) for index in range(class_count)}
 
 
 def augment(images: tf.Tensor, labels: tf.Tensor) -> tuple[tf.Tensor, tf.Tensor]:
@@ -113,6 +128,8 @@ def main() -> None:
     val_ds = load_split(args.data / "val", args.batch_size, False, args.seed)
     test_ds = load_split(args.data / "test", args.batch_size, False, args.seed)
     train_ds = train_raw.map(augment, num_parallel_calls=AUTOTUNE)
+    class_weights = balanced_class_weights(args.data / "train")
+    print("Class weights:", class_weights)
 
     args.output.mkdir(parents=True, exist_ok=True)
     checkpoint = args.output / "best.weights.h5"
@@ -120,6 +137,7 @@ def main() -> None:
     model.fit(
         train_ds,
         validation_data=val_ds,
+        class_weight=class_weights,
         epochs=args.epochs,
         callbacks=[
             tf.keras.callbacks.EarlyStopping(
@@ -175,4 +193,3 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
-
